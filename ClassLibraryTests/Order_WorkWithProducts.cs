@@ -1,6 +1,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Diagnostics;
 using ClassLibrary;
+using System.Linq;
 using System;
 
 namespace ClassLibraryTests;
@@ -86,7 +87,38 @@ public class Order_WorkWithProducts
         var actual = _order.GetProduct(testProduct).Description;
         Assert.AreEqual(expected, actual, false);
     }
-    // данный метод запускаетс€ перед каждым вызовом Unit-теста
+    [TestMethod]
+    public void OrderProducts_DeleteFirstProduct_ProductListMustNotToContainsThisProduct()
+    {
+        // act
+        try
+        {
+            var firstProduct = _order.Products.First(); // если список пуст, то будет сгенерировано исключение
+            _order.RemoveProduct(firstProduct);
+            CollectionAssert.DoesNotContain(_order.Products, firstProduct);
+        }
+        catch (ArgumentNullException arg)
+        {
+            Assert.Fail(arg.Message);
+        }
+        catch(InvalidOperationException oper)
+        {
+            Assert.Fail(oper.Message);
+        }
+    }
+    [TestMethod]
+    public void OrderProducts_AllItemsMustToBeUnique()
+    {
+        CollectionAssert.AllItemsAreUnique(_order.Products);
+    }
+    [TestMethod]
+    public void OrderProducts_AllItemsMustToBeNotNull()
+    {
+        CollectionAssert.AllItemsAreNotNull(_order.Products);
+    }
+    /// <summary>
+    /// ѕеред каждым выполнением теста присваивает переменным _product и _order шаблонные значени€.
+    /// </summary>
     [TestInitialize]
     public void TestInitialize()
     {
